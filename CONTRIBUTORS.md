@@ -1,4 +1,4 @@
-Carol (RA246914)
+Carol Cardoso (RA246914)
 Kina (RA260370)
 Seiji (RA230921)
 Lima (RA242827)
