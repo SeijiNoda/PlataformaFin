@@ -1,9 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CadastroScreen extends StatefulWidget {
   const CadastroScreen({super.key});
-  
+
   @override
   _CadastroScreenState createState() => _CadastroScreenState();
 }
@@ -14,12 +15,39 @@ class _CadastroScreenState extends State<CadastroScreen> {
   String _email = '';
   String _senha = '';
 
-  void _registrar() {
+  final CollectionReference usuariosCollection =
+      FirebaseFirestore.instance.collection('Usuários');
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  void _registrar() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      print("Nome: $_nome");
-      print("Email: $_email");
-      print("Senha: $_senha");
+      try {
+        // Criar o usuário com email e senha
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: _email,
+          password: _senha,
+        );
+
+        // Adicionar o nome do usuário ao Firestore
+        await usuariosCollection.doc(userCredential.user!.uid).set({
+          'nome': _nome,
+          'email': _email,
+        });
+
+        // Mostrar mensagem de sucesso
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Usuário registrado com sucesso!')),
+        );
+
+        // Limpar os campos após o registro
+        _formKey.currentState!.reset();
+      } catch (e) {
+        // Tratar erros de registro
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -28,7 +56,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Cadastro de Usuário'),
-        backgroundColor: Colors.green, // Cor do header
+        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -40,7 +68,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black, // Cor do texto
+                color: Colors.black,
               ),
             ),
             SizedBox(height: 20),
@@ -118,14 +146,14 @@ class _CadastroScreenState extends State<CadastroScreen> {
                   ElevatedButton(
                     onPressed: _registrar,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // Cor do botão
+                      backgroundColor: Colors.green,
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       textStyle: TextStyle(fontSize: 18),
                     ),
-                      child: Text(
-                        'Registrar',
-                        style: TextStyle(color: Colors.white), // Cor do texto do botão
-                      ),
+                    child: Text(
+                      'Registrar',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
