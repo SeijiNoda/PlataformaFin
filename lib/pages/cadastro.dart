@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class CadastroScreen extends StatefulWidget {
+  const CadastroScreen({super.key});
+  
   @override
   _CadastroScreenState createState() => _CadastroScreenState();
 }
@@ -26,63 +28,109 @@ class _CadastroScreenState extends State<CadastroScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Cadastro de Usuário'),
+        backgroundColor: Colors.green, // Cor do header
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Nome'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira seu nome';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _nome = value!;
-                },
+        child: Column(
+          children: [
+            SizedBox(height: 20),
+            Text(
+              'Crie sua conta',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black, // Cor do texto
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira seu email';
-                  }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Insira um email válido';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _email = value!;
-                },
+            ),
+            SizedBox(height: 20),
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Nome',
+                      labelStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu nome';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _nome = value!;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      labelStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu email';
+                      }
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        return 'Insira um email válido';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _email = value!;
+                    },
+                  ),
+                  SizedBox(height: 16),
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Senha',
+                      labelStyle: TextStyle(color: Colors.black),
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                    ),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira sua senha';
+                      }
+                      if (value.length < 6) {
+                        return 'A senha deve ter pelo menos 6 caracteres';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _senha = value!;
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _registrar,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green, // Cor do botão
+                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      textStyle: TextStyle(fontSize: 18),
+                    ),
+                      child: Text(
+                        'Registrar',
+                        style: TextStyle(color: Colors.white), // Cor do texto do botão
+                      ),
+                  ),
+                ],
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Senha'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira sua senha';
-                  }
-                  if (value.length < 6) {
-                    return 'A senha deve ter pelo menos 6 caracteres';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _senha = value!;
-                },
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _registrar,
-                child: Text('Registrar'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -94,4 +142,3 @@ void main() {
     home: CadastroScreen(),
   ));
 }
-
