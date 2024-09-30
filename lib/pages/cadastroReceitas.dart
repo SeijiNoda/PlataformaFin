@@ -11,10 +11,8 @@ class CadastroReceitas extends StatefulWidget {
 class CadastroReceitasState extends State<CadastroReceitas> {
   List<Map<String, dynamic>> receitasDespesas = [];
 
-  final CollectionReference receitasCollection =
-      FirebaseFirestore.instance.collection('Receitas');
-  final CollectionReference despesasCollection =
-      FirebaseFirestore.instance.collection('Despesas');
+  final CollectionReference receitasCollection = FirebaseFirestore.instance.collection('Receitas');
+  final CollectionReference despesasCollection = FirebaseFirestore.instance.collection('Despesas');
 
   @override
   void initState() {
@@ -53,8 +51,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
     });
   }
 
-  Future<void> adicionarReceitaOuDespesa(
-      String descricao, double valor, String tipo, String categoria) async {
+  Future<void> adicionarReceitaOuDespesa(String descricao, double valor, String tipo, String categoria) async {
     if (tipo == 'Receita') {
       await receitasCollection.add({
         'descricao': descricao,
@@ -109,9 +106,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                         DataCell(Text(item['valor'].toString())),
                         DataCell(Text(item['tipo'],
                             style: TextStyle(
-                              color: item['tipo'] == 'Receita'
-                                  ? Colors.green
-                                  : Colors.red,
+                              color: item['tipo'] == 'Receita' ? Colors.green : Colors.red,
                             ))),
                         //DataCell(Text(item['categoria'])),
                         DataCell(
@@ -213,10 +208,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                           tipoSelecionado != null &&
                           categoria != null) {
                         adicionarReceitaOuDespesa(
-                            descricaoController.text,
-                            double.parse(valorController.text),
-                            tipoSelecionado!,
-                            categoria!);
+                            descricaoController.text, double.parse(valorController.text), tipoSelecionado!, categoria!);
                         Navigator.pop(context);
                       }
                     },
@@ -227,8 +219,8 @@ class CadastroReceitasState extends State<CadastroReceitas> {
             },
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
       ),
     );
   }
