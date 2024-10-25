@@ -142,3 +142,56 @@ Com base nas duas aplicações estudadas, podemos expor alguns requisitos obtido
 - O sistema deve permitir que o usuário modifique as informações que são exibidas na página inicial.
 
 ## Segunda atividade de elicitação de requisitos: Entrevista
+
+A segunda atividade para elicitar requisitos realizada pelo nosso grupo foi a de entrevistas. Inicialmente, confeccionamos um roteiro com 18 perguntas, que eram:
+
+1. Atualmente, você possui alguma fonte de renda própria, emprego, freelancer, bolsa, etc?
+
+2. De 1 a 5, como você avalia o controle de suas finanças? (Sendo 5 muito bom e 1 muito ruim)
+
+   a. Por que essa nota?
+
+3. Com que frequência você costuma controlar suas finanças?
+
+   a. Algum motivo em específico para essa frequência?
+
+4. Você costuma organizar seus gastos por categorias ou subcategorias? Se possível, poderia explicitar as categorias?
+
+5. Você usa atualmente alguma ferramenta para controlar suas finanças? Qual? *(Ex: Planilhas, aplicativos, papel)*
+
+6. Quais atividades você realiza ao controlar suas finanças?
+
+7. O que você não consegue fazer atualmente no controle das suas finanças?
+
+8. O que não realizar essas tarefas implica a você?
+
+9. Pensando no seu uso atual e no que seria ideal, quais funcionalidades você considera essenciais para controlar suas finanças? *(Ex: Acompanhamento de despesas, metas financeiras, gráficos de consumo)*
+
+10. Que tipos de relatórios ou informações você gostaria de obter do sistema? (Ex: Relatório mensal de despesas, saldo de contas)
+
+11. Quais são os principais problemas que você enfrenta atualmente ao controlar suas finanças pessoais *(Pular se já respondido)*
+
+12. O que você gosta nas ferramentas que usa atualmente? O que você não gosta? *(Pedir para o entrevistado explicitar o porquê)*
+
+13. Se você pudesse mudar algo na forma como gerencia suas finanças hoje, o que seria?
+
+14. Quais ganhos que essa mudança traria para você?
+
+15. O que você espera de um aplicativo ideal para controle financeiro? *(Explorar mais do que funcionalidades: simplicidade, facilidade de uso, segurança)*
+
+16. Você se sentiria confortável em compartilhar seus dados bancários com o aplicativo para automatizar processos? Se não, por quê?
+
+17. Como você prefere ser notificado sobre suas finanças? *(Notificações push, e-mails, mensagens)*
+
+18. Existe algo que você gostaria de ver em um aplicativo de controle de finanças pessoais que ainda não mencionamos?
+
+Ao todo, nossa equipe conseguiu realizar 10 entrevistas, cujas transcrições podem ser lidas em nosso drive: https://drive.google.com/drive/folders/1HQHRDjZ-tQGy4tqx2JgCw0T8yz1oRSYX?usp=sharing. A partir das respostas que obtemos, pudemos elicitar os seguintes requisitos para o nosso projeto:
+
+**Nota:** Se um ponto for semelhante a um requisito já citado neste documento, ele foi omitido.
+
+- O sistema deve ter a capacidade de categorizar despesas (personalizável pelo usuário).
+- O sistema deve exibir relatórios semanais, mensais e anuais referentes às receitas e despesas do usuário.
+- O sistema deve permitir a definição de metas financeiras, como limites de gastos em categorias específicas.
+- O sistema deve exibir gráficos visuais para ajudar na visualização dos gastos.
+- O sistema deve comparar gastos mensais a fim do ajudar o usuário a identificar padrões e se houve aumenta ou redução das despesas.
+- O sistema deve oferecer a opção de notificar o usuário sobre informações relevantes.
