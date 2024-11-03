@@ -1,0 +1,56 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:my_app/services/receitasService.dart';
+
+void main() {
+  late FakeFirebaseFirestore fakeFirestore;
+
+  setUp(() {
+    fakeFirestore = FakeFirebaseFirestore();
+    receitasCollection = fakeFirestore.collection('Receitas');
+    despesasCollection = fakeFirestore.collection('Despesas');
+  });
+
+  group('receitasService', () {
+    test('getReceitasDespesas should return list of receitas and despesas', () async {
+      await receitasCollection.add({
+        'descricao': 'Salario',
+        'valor': 2000.0,
+        'categoria': 'Trabalho',
+      });
+      await despesasCollection.add({
+        'descricao': 'Aluguel',
+        'valor': 1000.0,
+        'categoria': 'Habitacao',
+      });
+
+      // Call the function
+      final result = await getReceitasDespesas();
+
+      expect(result.length, 2);
+      expect(result[0]['descricao'], 'Salario');
+      expect(result[1]['descricao'], 'Aluguel');
+    });
+
+    test('adicionarReceitaOuDespesa should add a receita', () async {
+      await adicionarReceitaOuDespesa('Bonus', 500.0, 'Receita', 'Trabalho');
+      final receitas = await receitasCollection.get();
+      
+      expect(receitas.docs.length, 1);
+      expect(receitas.docs.first['descricao'], 'Bonus');
+    });
+
+    test('removerReceitaOuDespesa should remove a receita or despesa', () async {
+      final docRef = await receitasCollection.add({
+        'descricao': 'Freelance',
+        'valor': 800.0,
+        'categoria': 'Trabalho',
+      });
+
+      await removerReceitaOuDespesa(docRef.id, 'Receita');
+      final receitas = await receitasCollection.get();
+
+      expect(receitas.docs.length, 0);
+    });
+  });
+}
