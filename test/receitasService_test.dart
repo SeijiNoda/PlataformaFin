@@ -12,7 +12,7 @@ void main() {
   });
 
   group('receitasService', () {
-    test('getReceitasDespesas should return list of receitas and despesas', () async {
+    test('getReceitasDespesas deve retornar lista de receitas e despesas', () async {
       await receitasCollection.add({
         'descricao': 'Salario',
         'valor': 2000.0,
@@ -24,7 +24,6 @@ void main() {
         'categoria': 'Habitacao',
       });
 
-      // Call the function
       final result = await getReceitasDespesas();
 
       expect(result.length, 2);
@@ -32,7 +31,7 @@ void main() {
       expect(result[1]['descricao'], 'Aluguel');
     });
 
-    test('adicionarReceitaOuDespesa should add a receita', () async {
+    test('adicionarReceitaOuDespesa deve adicionar a receita', () async {
       await adicionarReceitaOuDespesa('Bonus', 500.0, 'Receita', 'Trabalho');
       final receitas = await receitasCollection.get();
       
@@ -40,7 +39,7 @@ void main() {
       expect(receitas.docs.first['descricao'], 'Bonus');
     });
 
-    test('removerReceitaOuDespesa should remove a receita or despesa', () async {
+    test('removerReceitaOuDespesa deve remover a receita ou despesa', () async {
       final docRef = await receitasCollection.add({
         'descricao': 'Freelance',
         'valor': 800.0,
