@@ -12,7 +12,7 @@ Nomes:
 
 Na figura abaixo, apresentamos o diagrama de componentes para modelar a arquitetura utilizada em nosso projeto. Nesse modelo, o usuário interage com a aplicação mobile, e cada requisição é tratada por uma feature específica.  
 
-![MC656  Avaliação A4 - Diagrama C4 (5)](https://github.com/user-attachments/assets/fd0e4ac4-9065-4b26-9471-055233b78339)
+![MC656  Avaliação A4 - Diagrama C4 (6)](https://github.com/user-attachments/assets/01f6fa02-8423-4412-a4fe-95597c5a032e)
 
 O estilo arquitetural que optamos por utilizar foi o MVC (Model-View-Controller). Por isso, nossa aplicação foi dividida em três componentes independentes, cada uma com suas próprias funcionalidades e funções:
 
