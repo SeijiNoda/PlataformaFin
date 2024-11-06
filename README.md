@@ -20,3 +20,7 @@ O estilo arquitetural que optamos por utilizar foi o MVC (Model-View-Controller)
 - **View:** Interface gráfica com o usuário, ou seja, o front-end do projeto.
 - **Controller:** Controlador que invoca e sincroniza o modelo com a visão.
 
+
+### Padrão de projeto
+
+Para o projeto do Componente de Integração bancária, o grupo optou por escolher o padrão Façade a fim de simplificar a interação com o sistema bancário externo. A escolha desse padrão se deve ao fato dele fornecer uma interface simplificada para subsistemas complexos (neste caso, APIs bancárias), escondendo alguns detalhes internos e otimizando o uso. Além disso, o padrão Façade facilita a interação com diferentes bancos ao encapsular as complexidades em uma única interface.
