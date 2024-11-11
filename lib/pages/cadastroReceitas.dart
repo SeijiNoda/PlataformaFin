@@ -1,5 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_app/services/receitasService.dart';
+// import '../models/receita.dart';
+// import '../models/despesa.dart';
 
 class CadastroReceitas extends StatefulWidget {
   const CadastroReceitas({super.key});
@@ -10,76 +12,35 @@ class CadastroReceitas extends StatefulWidget {
 
 class CadastroReceitasState extends State<CadastroReceitas> {
   List<Map<String, dynamic>> receitasDespesas = [];
-
-  final CollectionReference receitasCollection =
-      FirebaseFirestore.instance.collection('Receitas');
-  final CollectionReference despesasCollection =
-      FirebaseFirestore.instance.collection('Despesas');
-
   @override
   void initState() {
     super.initState();
-    getReceitasDespesas();
+    loadReceitasDespesas();
   }
 
-  Future<void> getReceitasDespesas() async {
-    List<Map<String, dynamic>> receitas = [];
-    List<Map<String, dynamic>> despesas = [];
-
-    QuerySnapshot receitasSnapshot = await receitasCollection.get();
-    receitas = receitasSnapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'categoria': doc['categoria'],
-        'tipo': 'Receita',
-      };
-    }).toList();
-
-    QuerySnapshot despesasSnapshot = await despesasCollection.get();
-    despesas = despesasSnapshot.docs.map((doc) {
-      return {
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'categoria': doc['categoria'],
-        'tipo': 'Despesa',
-      };
-    }).toList();
-
+  void loadReceitasDespesas() async {
+    List<Map<String, dynamic>> updatedList = await getReceitasDespesas();
     setState(() {
-      receitasDespesas = [...receitas, ...despesas];
+      receitasDespesas = updatedList;
     });
   }
 
-  Future<void> adicionarReceitaOuDespesa(
-      String descricao, double valor, String tipo, String categoria) async {
-    if (tipo == 'Receita') {
-      await receitasCollection.add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
-      });
-    } else if (tipo == 'Despesa') {
-      await despesasCollection.add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
-      });
-    }
-    getReceitasDespesas();
-  }
+  void adicionarRecOuDes(
+    String descricao, double valor, String tipo, String categoria) async {
+  List<Map<String, dynamic>> updatedList =
+      await adicionarReceitaOuDespesa(descricao, valor, tipo, categoria);
+  setState(() {
+    receitasDespesas = updatedList;
+  });
+}
 
-  Future<void> removerReceitaOuDespesa(String id, String tipo) async {
-    if (tipo == 'Receita') {
-      await receitasCollection.doc(id).delete();
-    } else if (tipo == 'Despesa') {
-      await despesasCollection.doc(id).delete();
-    }
+void removerRecOuDes(String id, String tipo) async {
+  List<Map<String, dynamic>> updatedList = await removerReceitaOuDespesa(id, tipo);
+  setState(() {
+    receitasDespesas = updatedList;
+  });
+}
 
-    getReceitasDespesas();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +173,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
                           valorController.text.isNotEmpty &&
                           tipoSelecionado != null &&
                           categoria != null) {
-                        adicionarReceitaOuDespesa(
+                        adicionarRecOuDes(
                             descricaoController.text,
                             double.parse(valorController.text),
                             tipoSelecionado!,
@@ -251,7 +212,7 @@ class CadastroReceitasState extends State<CadastroReceitas> {
               child: const Text("Remover"),
               onPressed: () {
                 Navigator.of(context).pop();
-                removerReceitaOuDespesa(id, tipo);
+                removerRecOuDes(id, tipo);
               },
             ),
           ],
