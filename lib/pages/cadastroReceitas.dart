@@ -70,9 +70,7 @@ void removerRecOuDes(String id, String tipo) async {
                         DataCell(Text(item['valor'].toString())),
                         DataCell(Text(item['tipo'],
                             style: TextStyle(
-                              color: item['tipo'] == 'Receita'
-                                  ? Colors.green
-                                  : Colors.red,
+                              color: item['tipo'] == 'Receita' ? Colors.green : Colors.red,
                             ))),
                         //DataCell(Text(item['categoria'])),
                         DataCell(
@@ -188,8 +186,8 @@ void removerRecOuDes(String id, String tipo) async {
             },
           );
         },
-        child: const Icon(Icons.add),
         backgroundColor: Colors.green,
+        child: const Icon(Icons.add),
       ),
     );
   }
