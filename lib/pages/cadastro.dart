@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class CadastroScreen extends StatefulWidget {
-  const CadastroScreen({super.key});
+  final VoidCallback showLoginPage;
+  const CadastroScreen({super.key, required this.showLoginPage});
 
   @override
-  _CadastroScreenState createState() => _CadastroScreenState();
+  State<CadastroScreen> createState() => _CadastroScreenState();
 }
 
 class _CadastroScreenState extends State<CadastroScreen> {
@@ -55,15 +56,15 @@ class _CadastroScreenState extends State<CadastroScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cadastro de Usuário'),
+        title: const Text('Cadastro de Usuário'),
         backgroundColor: Colors.green,
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Crie sua conta',
               style: TextStyle(
                 fontSize: 24,
@@ -71,13 +72,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
                 color: Colors.black,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Form(
               key: _formKey,
               child: Column(
                 children: [
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Nome',
                       labelStyle: TextStyle(color: Colors.black),
                       border: OutlineInputBorder(),
@@ -95,9 +96,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       _nome = value!;
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Email',
                       labelStyle: TextStyle(color: Colors.black),
                       border: OutlineInputBorder(),
@@ -118,9 +119,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       _email = value!;
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Senha',
                       labelStyle: TextStyle(color: Colors.black),
                       border: OutlineInputBorder(),
@@ -142,17 +143,26 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       _senha = value!;
                     },
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _registrar,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
-                      padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                      textStyle: TextStyle(fontSize: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      textStyle: const TextStyle(fontSize: 18),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Registrar',
                       style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text('Já tem uma conta?'),
+                  GestureDetector(
+                    onTap: widget.showLoginPage,
+                    child: const Text(
+                        'Faça login',
+                        style: TextStyle(color: Colors.blue),
                     ),
                   ),
                 ],
@@ -163,10 +173,4 @@ class _CadastroScreenState extends State<CadastroScreen> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: CadastroScreen(),
-  ));
 }

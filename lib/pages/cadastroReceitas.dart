@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/services/receitasService.dart';
 // import '../models/receita.dart';
@@ -11,6 +12,7 @@ class CadastroReceitas extends StatefulWidget {
 }
 
 class CadastroReceitasState extends State<CadastroReceitas> {
+  final user = FirebaseAuth.instance.currentUser;
   List<Map<String, dynamic>> receitasDespesas = [];
   @override
   void initState() {
@@ -47,7 +49,7 @@ void removerRecOuDes(String id, String tipo) async {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas e Despesas'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue,
       ),
       backgroundColor: Colors.grey[100],
       body: SafeArea(
@@ -186,7 +188,7 @@ void removerRecOuDes(String id, String tipo) async {
             },
           );
         },
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blue,
         child: const Icon(Icons.add),
       ),
     );
