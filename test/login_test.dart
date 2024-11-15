@@ -9,11 +9,11 @@ class MockFirebaseAuthWithCustomErrors extends MockFirebaseAuth {
     required String email,
     required String password,
   }) async {
-    // Simulate boundary conditions for email
+
     if (email.isEmpty || !email.contains('@') || email.length > 254) {
       throw Exception('Invalid email address.');
     }
-    // Simulate boundary conditions for password
+
     if (password.isEmpty || password.length < 6 || password.length > 128) {
       throw Exception('Invalid password.');
     }
@@ -38,7 +38,7 @@ void main() {
       passwordController.dispose();
     });
 
-    test('Login falha com email vazio (Análise de Valor Limite)', () async {
+    test('Login falha com email vazio (Analise de Valor Limite)', () async {
       emailController.text = '';
       passwordController.text = 'senha123';
 
@@ -57,7 +57,7 @@ void main() {
       );
     });
 
-    test('Login falha com email muito longo (Análise de Valor Limite)', () async {
+    test('Login falha com email muito longo (Analise de Valor Limite)', () async {
       emailController.text = '${'a' * 255}@test.com';
       passwordController.text = 'password123';
 
@@ -76,7 +76,7 @@ void main() {
       );
     });
 
-    test('Login falha com senha vazia (Análise de Valor Limite)', () async {
+    test('Login falha com senha vazia (Analise de Valor Limite)', () async {
       emailController.text = 'test@test.com';
       passwordController.text = '';
 
@@ -95,7 +95,7 @@ void main() {
       );
     });
 
-    test('Login falha com senha com menos de 6 caracteres (Análise de Valor Limite)', () async {
+    test('Login falha com senha com menos de 6 caracteres (Analise de Valor Limite)', () async {
       emailController.text = 'test@test.com';
       passwordController.text = '12345';
 
@@ -114,7 +114,7 @@ void main() {
       );
     });
 
-    test('Login falha com senha com mais de 128 caracteres (Análise de Valor Limite)', () async {
+    test('Login falha com senha com mais de 128 caracteres (Analise de Valor Limite)', () async {
       emailController.text = 'test@test.com';
       passwordController.text = 'a' * 129;
 
@@ -133,7 +133,7 @@ void main() {
       );
     });
 
-    test('Sucesso no login com email e senhas válidos', () async {
+    test('Sucesso no login com email e senhas validos', () async {
       emailController.text = 'test@test.com';
       passwordController.text = 'senha123';
 
