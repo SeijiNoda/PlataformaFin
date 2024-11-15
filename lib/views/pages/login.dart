@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:my_app/views/components/SignInButton.dart';
+import 'package:my_app/models/services/loginService.dart';
 import 'package:my_app/views/components/TextInput.dart';
 
 class LoginScreen extends StatefulWidget {
-    final VoidCallback showRegisterPage;
+  final VoidCallback showRegisterPage;
   const LoginScreen({super.key, required this.showRegisterPage});
 
   @override
@@ -12,9 +12,34 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _errorMessage;
+
+  void _validateAndSignIn() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || !email.contains('@') || email.length > 254) {
+      setState(() {
+        _errorMessage = "Por favor, insira um endereço de email válido.";
+      });
+      return;
+    }
+
+    if (password.isEmpty || password.length < 6 || password.length > 128) {
+      setState(() {
+        _errorMessage = "A senha deve ter entre 6 e 128 caracteres.";
+      });
+      return;
+    }
+
+    final result = await LoginService.signIn(email, password);
+
+    setState(() {
+      _errorMessage = result;
+    });
+  }
 
   @override
   void dispose() {
@@ -42,12 +67,50 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: GoogleFonts.bebasNeue(
                         fontSize: 30, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 50),
-                TextInput(placeholder: "Email", controller:_emailController),
+                if (_errorMessage != null) ...[
+                  Text(
+                    _errorMessage!,
+                    style: const TextStyle(color: Colors.red, fontSize: 16),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                TextInput(placeholder: "Email", controller: _emailController),
                 const SizedBox(height: 10),
-                TextInput(placeholder: "Password", obscureText: true, controller:_passwordController),
+                TextInput(
+                    placeholder: "Password",
+                    obscureText: true,
+                    controller: _passwordController),
                 const SizedBox(height: 10),
-                Signinbutton(emailcontroller: _emailController, passwordcontroller: _passwordController),
+                Padding(
+                  padding: const EdgeInsets.all(25),
+                  child: GestureDetector(
+                    onTap: _validateAndSignIn,
+                    child: Container(
+                      padding: const EdgeInsets.all(25),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "Entrar",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
+                const Text(
+                  'Ainda não possui uma conta?',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
                 GestureDetector(
                   onTap: widget.showRegisterPage,
                   child: const Text(
@@ -57,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
