@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/auth/authPage.dart';
-import 'package:my_app/pages/cadastroReceitas.dart';
+import 'package:my_app/controllers/auth/authPage.dart';
+import 'package:my_app/views/pages/cadastroReceitas.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});

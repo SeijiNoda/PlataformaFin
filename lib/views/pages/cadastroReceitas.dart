@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:my_app/services/receitasService.dart';
+import 'package:my_app/models/services/receitasService.dart';
 // import '../models/receita.dart';
 // import '../models/despesa.dart';
 
@@ -42,8 +42,6 @@ void removerRecOuDes(String id, String tipo) async {
     receitasDespesas = updatedList;
   });
 }
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
