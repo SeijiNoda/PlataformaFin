@@ -9,15 +9,20 @@ class MockFirebaseAuthWithCustomErrors extends MockFirebaseAuth {
     required String email,
     required String password,
   }) async {
-    if (email != 'test@example.com' || password != 'password123') {
-      throw Exception('The password is invalid or the user does not have a password.');
+    // Simulate boundary conditions for email
+    if (email.isEmpty || !email.contains('@') || email.length > 254) {
+      throw Exception('Invalid email address.');
+    }
+    // Simulate boundary conditions for password
+    if (password.isEmpty || password.length < 6 || password.length > 128) {
+      throw Exception('Invalid password.');
     }
     return super.signInWithEmailAndPassword(email: email, password: password);
   }
 }
 
 void main() {
-  group('SignInbutton tests', () {
+  group('Login', () {
     late MockFirebaseAuthWithCustomErrors mockAuth;
     late TextEditingController emailController;
     late TextEditingController passwordController;
@@ -33,14 +38,108 @@ void main() {
       passwordController.dispose();
     });
 
-    test('Login succeeds with valid email and password', () async {
-      emailController.text = 'test@example.com';
+    test('Login falha com email vazio (Análise de Valor Limite)', () async {
+      emailController.text = '';
+      passwordController.text = 'senha123';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com email muito longo (Análise de Valor Limite)', () async {
+      emailController.text = '${'a' * 255}@test.com';
       passwordController.text = 'password123';
 
-      // Mock the authentication
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid email address.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha vazia (Análise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = '';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha com menos de 6 caracteres (Análise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = '12345';
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
+    test('Login falha com senha com mais de 128 caracteres (Análise de Valor Limite)', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = 'a' * 129;
+
+      expect(
+        () async => await mockAuth.signInWithEmailAndPassword(
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        ),
+        throwsA(
+          isA<Exception>().having(
+            (e) => e.toString(),
+            'message',
+            contains('Invalid password.'),
+          ),
+        ),
+      );
+    });
+
+    test('Sucesso no login com email e senhas válidos', () async {
+      emailController.text = 'test@test.com';
+      passwordController.text = 'senha123';
+
       await mockAuth.createUserWithEmailAndPassword(
-        email: 'test@example.com',
-        password: 'password123',
+        email: emailController.text.trim(),
+        password: passwordController.text.trim(),
       );
 
       await mockAuth.signInWithEmailAndPassword(
@@ -50,50 +149,7 @@ void main() {
 
       final user = mockAuth.currentUser;
       expect(user, isNotNull);
-      expect(user?.email, equals('test@example.com'));
-    });
-
-    test('Login fails with invalid email', () async {
-      emailController.text = 'invalid-email';
-      passwordController.text = 'password123';
-
-      expect(
-        () async => await mockAuth.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        ),
-        throwsA(
-          isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('The password is invalid or the user does not have a password.'),
-          ),
-        ),
-      );
-    });
-
-    test('Login fails with wrong password', () async {
-      emailController.text = 'test@example.com';
-      passwordController.text = 'wrongpassword';
-
-      await mockAuth.createUserWithEmailAndPassword(
-        email: 'test@example.com',
-        password: 'password123',
-      );
-
-      expect(
-        () async => await mockAuth.signInWithEmailAndPassword(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        ),
-        throwsA(
-          isA<Exception>().having(
-            (e) => e.toString(),
-            'message',
-            contains('The password is invalid or the user does not have a password.'),
-          ),
-        ),
-      );
+      expect(user?.email, equals('test@test.com'));
     });
   });
 }
