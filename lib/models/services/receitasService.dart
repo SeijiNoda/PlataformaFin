@@ -40,7 +40,6 @@ Future<List<Map<String, dynamic>>> adicionarReceitaOuDespesa(
     });
   }
 
-  // Return updated list
   return getReceitasDespesas();
 }
 
@@ -52,7 +51,6 @@ Future<List<Map<String, dynamic>>> removerReceitaOuDespesa(
     await despesasCollection.doc(id).delete();
   }
 
-  // Return updated list
   return getReceitasDespesas();
 }
 

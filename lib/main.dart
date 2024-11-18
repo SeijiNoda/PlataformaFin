@@ -1,9 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/firebase_options.dart';
-import 'pages/cadastroReceitas.dart';
-import 'package:my_app/pages/cadastro.dart';
-import 'pages/metas.dart';
+import 'package:my_app/controllers/auth/mainPage.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home:CadastroScreen(),
+      home: MainPage(),
     );
   }
 }
