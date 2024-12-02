@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../components/constants.dart';  // Importando o arquivo de constantes para cores
 
 class CadastroScreen extends StatefulWidget {
   final VoidCallback showLoginPage;
@@ -12,9 +13,9 @@ class CadastroScreen extends StatefulWidget {
 
 class _CadastroScreenState extends State<CadastroScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _nome = '';
-  String _email = '';
-  String _senha = '';
+  final TextEditingController _nomeController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _senhaController = TextEditingController();
 
   final CollectionReference usuariosCollection =
       FirebaseFirestore.instance.collection('Usuários');
@@ -22,19 +23,12 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
   void _registrar() async {
     if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
       try {
         // Criar o usuário com email e senha
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: _email,
-          password: _senha,
-        );
+        UserCredential userCredential = await _registrarUsuario();
 
         // Adicionar o nome do usuário ao Firestore
-        await usuariosCollection.doc(userCredential.user!.uid).set({
-          'nome': _nome,
-          'email': _email,
-        });
+        await _salvarUsuarioFirestore(userCredential.user!.uid);
 
         // Mostrar mensagem de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
@@ -43,6 +37,9 @@ class _CadastroScreenState extends State<CadastroScreen> {
 
         // Limpar os campos após o registro
         _formKey.currentState!.reset();
+        _nomeController.clear();
+        _emailController.clear();
+        _senhaController.clear();
       } catch (e) {
         // Tratar erros de registro
         ScaffoldMessenger.of(context).showSnackBar(
@@ -52,12 +49,57 @@ class _CadastroScreenState extends State<CadastroScreen> {
     }
   }
 
+  Future<UserCredential> _registrarUsuario() async {
+    String email = _emailController.text;
+    String senha = _senhaController.text;
+    return await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: senha,
+    );
+  }
+
+  Future<void> _salvarUsuarioFirestore(String uid) async {
+    String nome = _nomeController.text;
+    String email = _emailController.text;
+    await usuariosCollection.doc(uid).set({
+      'nome': nome,
+      'email': email,
+    });
+  }
+
+  String? _validarEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor, insira seu email';
+    }
+    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      return 'Insira um email válido';
+    }
+    return null;
+  }
+
+  String? _validarSenha(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Por favor, insira sua senha';
+    }
+    if (value.length < 6) {
+      return 'A senha deve ter pelo menos 6 caracteres';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastro de Usuário'),
-        backgroundColor: Colors.green,
+        title: const Text(
+          'Cadastro de Usuário',
+          style: TextStyle(
+            color: AppColors.textSecondaryColor, // Cor branca para o título
+            fontWeight: FontWeight.bold,  // Fonte em negrito
+          ),
+        ),
+        backgroundColor: AppColors.primaryColor,
+        centerTitle: true,  // Centralizando o título
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,6 +120,7 @@ class _CadastroScreenState extends State<CadastroScreen> {
               child: Column(
                 children: [
                   TextFormField(
+                    controller: _nomeController,
                     decoration: const InputDecoration(
                       labelText: 'Nome',
                       labelStyle: TextStyle(color: Colors.black),
@@ -92,12 +135,10 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      _nome = value!;
-                    },
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    controller: _emailController,
                     decoration: const InputDecoration(
                       labelText: 'Email',
                       labelStyle: TextStyle(color: Colors.black),
@@ -106,21 +147,11 @@ class _CadastroScreenState extends State<CadastroScreen> {
                         borderSide: BorderSide(color: Colors.black),
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, insira seu email';
-                      }
-                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                        return 'Insira um email válido';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _email = value!;
-                    },
+                    validator: _validarEmail,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
+                    controller: _senhaController,
                     decoration: const InputDecoration(
                       labelText: 'Senha',
                       labelStyle: TextStyle(color: Colors.black),
@@ -130,24 +161,13 @@ class _CadastroScreenState extends State<CadastroScreen> {
                       ),
                     ),
                     obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, insira sua senha';
-                      }
-                      if (value.length < 6) {
-                        return 'A senha deve ter pelo menos 6 caracteres';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _senha = value!;
-                    },
+                    validator: _validarSenha,
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _registrar,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                      backgroundColor: AppColors.primaryColor,
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       textStyle: const TextStyle(fontSize: 18),
                     ),
