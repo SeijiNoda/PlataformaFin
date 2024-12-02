@@ -16,37 +16,43 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   String? _errorMessage;
 
-  void _validateAndSignIn() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (email.isEmpty || !email.contains('@') || email.length > 254) {
-      setState(() {
-        _errorMessage = "Por favor, insira um endereço de email válido.";
-      });
-      return;
-    }
-
-    if (password.isEmpty || password.length < 6 || password.length > 128) {
-      setState(() {
-        _errorMessage = "A senha deve ter entre 6 e 128 caracteres.";
-      });
-      return;
-    }
-
-    final result = await LoginService.signIn(email, password);
-
-    setState(() {
-      _errorMessage = result;
-    });
-  }
-
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
+
+void _validateAndSignIn() async {
+  final email = _emailController.text.trim();
+  final password = _passwordController.text.trim();
+
+  if (email.isEmpty || !email.contains('@') || email.length > 254) {
+    if (mounted) {
+      setState(() {
+        _errorMessage = "Por favor, insira um endereço de email válido.";
+      });
+    }
+    return;
+  }
+
+  if (password.isEmpty || password.length < 6 || password.length > 128) {
+    if (mounted) {
+      setState(() {
+        _errorMessage = "A senha deve ter entre 6 e 128 caracteres.";
+      });
+    }
+    return;
+  }
+
+  final result = await LoginService.signIn(email, password);
+
+  if (mounted) {
+    setState(() {
+      _errorMessage = result;
+    });
+  }
+}
 
   @override
   Widget build(BuildContext context) {

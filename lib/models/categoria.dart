@@ -19,10 +19,13 @@ class Category {
   Category({required this.name, required this.monthlyLimits});
 
   MonthlyLimit? getLimitForMonth(int month, int year) {
-    return monthlyLimits.firstWhere(
-      (limit) => limit.month == month && limit.year == year,
-      orElse: () => null,
-    );
+    try {
+      return monthlyLimits.firstWhere(
+        (limit) => limit.month == month && limit.year == year,
+      );
+    } catch (e) {
+      return null; // Se não encontrar, retorna null
+    }
   }
 
   void addExpense(Category category, double expense, int month, int year) {
@@ -39,5 +42,4 @@ class Category {
       print('Gasto adicionado. Total gasto: ${limit.spent}');
     }
   }
-
 }

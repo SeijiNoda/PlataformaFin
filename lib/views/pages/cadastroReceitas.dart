@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/models/services/receitasService.dart';
+import 'package:my_app/views/pages/cadastroCategoria.dart';
 import 'package:my_app/views/pages/login.dart';
 
 class CadastroReceitas extends StatefulWidget {
@@ -13,34 +15,110 @@ class CadastroReceitas extends StatefulWidget {
 class CadastroReceitasState extends State<CadastroReceitas> {
   final user = FirebaseAuth.instance.currentUser;
   List<Map<String, dynamic>> receitasDespesas = [];
-  
+
   @override
   void initState() {
     super.initState();
     loadReceitasDespesas();
   }
 
-  void loadReceitasDespesas() async {
-    List<Map<String, dynamic>> updatedList = await getReceitasDespesas();
+void loadReceitasDespesas() async {
+  final userId = user?.uid;
+  if (userId != null) {
+    final db = FirebaseFirestore.instance;
+
+    // Carregar receitas e despesas associadas ao usuário
+    final receitasSnapshot = await db.collection('Usuários').doc(userId).collection('Receitas').get();
+    final despesasSnapshot = await db.collection('Usuários').doc(userId).collection('Despesas').get();
+
+    List<Map<String, dynamic>> updatedList = [];
+    
+    // Carregar receitas
+    for (var doc in receitasSnapshot.docs) {
+      updatedList.add({
+        'id': doc.id,
+        'descricao': doc['descricao'],
+        'valor': doc['valor'],
+        'tipo': 'Receita', // Tipo fixo para receitas
+        'categoria': doc['categoria'],
+      });
+    }
+
+    // Carregar despesas
+    for (var doc in despesasSnapshot.docs) {
+      updatedList.add({
+        'id': doc.id,
+        'descricao': doc['descricao'],
+        'valor': doc['valor'],
+        'tipo': 'Despesa', // Tipo fixo para despesas
+        'categoria': doc['categoria'],
+      });
+    }
+
     setState(() {
       receitasDespesas = updatedList;
     });
   }
+}
 
-  void adicionarRecOuDes(
-    String descricao, double valor, String tipo, String categoria) async {
-  List<Map<String, dynamic>> updatedList =
-      await adicionarReceitaOuDespesa(descricao, valor, tipo, categoria);
-  setState(() {
-    receitasDespesas = updatedList;
-  });
+void adicionarRecOuDes(String descricao, double valor, String tipo, String categoria) async {
+  final userId = user?.uid; // Pegue o ID do usuário atual
+
+  if (userId != null) {
+    final db = FirebaseFirestore.instance;
+
+    // A estrutura do Firestore será: Usuários -> userId -> Receitas/Despesas
+    final ref = db.collection('Usuários').doc(userId);
+
+    // Criar ou atualizar a receita/despesa dependendo do tipo
+    if (tipo == 'Receita') {
+      await ref.collection('Receitas').add({
+        'descricao': descricao,
+        'valor': valor,
+        'categoria': categoria,
+        'tipo': tipo,
+        'dataCriacao': FieldValue.serverTimestamp(),
+      });
+    } else if (tipo == 'Despesa') {
+      await ref.collection('Despesas').add({
+        'descricao': descricao,
+        'valor': valor,
+        'categoria': categoria,
+        'tipo': tipo,
+        'dataCriacao': FieldValue.serverTimestamp(),
+      });
+    }
+
+    // Recarregar os dados após adicionar
+    loadReceitasDespesas();
+  }
 }
 
 void removerRecOuDes(String id, String tipo) async {
-  List<Map<String, dynamic>> updatedList = await removerReceitaOuDespesa(id, tipo);
-  setState(() {
-    receitasDespesas = updatedList;
-  });
+  final userId = user?.uid;
+  if (userId != null) {
+    final db = FirebaseFirestore.instance;
+
+    // Remover o item da subcoleção de acordo com o tipo (Receita ou Despesa)
+    if (tipo == 'Receita') {
+      await db.collection('Usuários').doc(userId).collection('Receitas').doc(id).delete();
+    } else if (tipo == 'Despesa') {
+      await db.collection('Usuários').doc(userId).collection('Despesas').doc(id).delete();
+    }
+
+    // Recarregar os dados após remoção
+    loadReceitasDespesas();
+  }
+}
+
+  // Função para fazer o logout
+void _logout() async {
+  await FirebaseAuth.instance.signOut();
+  // Após o logout, vamos garantir que a tela de login será a única na pilha de navegação.
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {})),
+  );
 }
 
   @override
@@ -250,41 +328,25 @@ void removerRecOuDes(String id, String tipo) async {
           ListTile(
             title: const Text('Página 1'),
             onTap: () {
-              // Substitua a linha abaixo pelo código da navegação para a Página 1
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 1
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Página 2'),
-            onTap: () {
-              // Substitua a linha abaixo pelo código da navegação para a Página 2
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 2
-              );
+                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {})),
+              ); 
             },
           ),
           ListTile(
             title: const Text('Cadastro de Categorias'),
             onTap: () {
-              // Substitua a linha abaixo pelo código da navegação para a Página 3
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 3
+                MaterialPageRoute(builder: (context) => AddCategoryScreen()),
               );
             },
           ),
           ListTile(
             title: const Text('Sair'),
             onTap: () {
-              // Substitua a linha abaixo pelo código da navegação para a Página 4
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 4
-              );
+              _logout(); // Chama a função de logout
             },
           ),
         ],

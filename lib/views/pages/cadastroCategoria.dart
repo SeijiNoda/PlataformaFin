@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:my_app/models/categoria.dart';
 
 class AddCategoryScreen extends StatelessWidget {
   final TextEditingController nameController = TextEditingController();
