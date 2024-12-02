@@ -8,7 +8,6 @@ import 'package:my_app/views/pages/login.dart';
 import 'package:my_app/views/pages/metas.dart';
 import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
 
-
 class CadastroReceitas extends StatefulWidget {
   const CadastroReceitas({super.key});
 
