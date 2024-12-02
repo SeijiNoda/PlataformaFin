@@ -3,10 +3,14 @@ import 'package:my_app/models/categoria.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Para interagir com o Firebase
 import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
 import 'package:my_app/views/pages/cadastroReceitas.dart'; // Importando a tela CadastroReceitas
-import 'package:cloud_firestore/cloud_firestore.dart'; // Importando o Firestore
 import 'package:firebase_auth/firebase_auth.dart'; // Importando o FirebaseAuth
 
-class AddCategoryScreen extends StatelessWidget {
+class AddCategoryScreen extends StatefulWidget {
+  @override
+  _AddCategoryScreenState createState() => _AddCategoryScreenState();
+}
+
+class _AddCategoryScreenState extends State<AddCategoryScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController limitController = TextEditingController();
   final TextEditingController monthController = TextEditingController();
@@ -14,7 +18,6 @@ class AddCategoryScreen extends StatelessWidget {
 
   // Função para adicionar a categoria no Firebase
   Future<void> addCategoryToFirebase(BuildContext context) async {
-    // Acessando o usuário atual
     final user = FirebaseAuth.instance.currentUser;
     
     if (user != null) {
@@ -35,7 +38,6 @@ class AddCategoryScreen extends StatelessWidget {
       );
 
       try {
-        // Adiciona a categoria na subcoleção
         await categoryCollection.add({
           'name': category.name,
           'monthlyLimits': category.monthlyLimits.map((limit) => {
@@ -45,23 +47,47 @@ class AddCategoryScreen extends StatelessWidget {
           }).toList(),
         });
 
-        // Exibe o snackbar de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Categoria criada com sucesso!')),
         );
 
-        // Redireciona para a tela CadastroReceitas
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => CadastroReceitas()),
         );
       } catch (e) {
-        // Exibe o erro se houver
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Erro ao criar categoria.')),
         );
       }
     }
+  }
+
+  // Função para buscar as categorias no Firebase
+  Future<List<Category>> getCategories() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final categoryCollection = FirebaseFirestore.instance
+          .collection('Usuários')
+          .doc(user.uid)
+          .collection('Categoria');
+      final snapshot = await categoryCollection.get();
+
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        return Category(
+          name: data['name'],
+          monthlyLimits: (data['monthlyLimits'] as List)
+              .map((item) => MonthlyLimit(
+                    month: item['month'],
+                    year: item['year'],
+                    limit: item['limit'],
+                  ))
+              .toList(),
+        );
+      }).toList();
+    }
+    return [];
   }
 
   @override
@@ -82,7 +108,7 @@ class AddCategoryScreen extends StatelessWidget {
         ),
       ),
       backgroundColor: Colors.grey[100],
-      drawer: DrawerMenu(), // Usando o DrawerMenu aqui
+      drawer: DrawerMenu(),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -110,10 +136,52 @@ class AddCategoryScreen extends StatelessWidget {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // Chama a função para adicionar a categoria e redirecionar
                   addCategoryToFirebase(context);
                 },
                 child: const Text('Salvar'),
+              ),
+              const SizedBox(height: 20),
+              // Título para a lista de categorias
+              const Text(
+                'Suas categorias',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 10),
+              FutureBuilder<List<Category>>(
+                future: getCategories(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) {
+                    return Text('Erro: ${snapshot.error}');
+                  }
+                  if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('Nenhuma categoria criada.');
+                  }
+
+                  final categories = snapshot.data!;
+
+                  return Expanded(
+                    child: ListView(
+                      children: categories.map((category) {
+                        return ExpansionTile(
+                          title: Text(category.name),
+                          children: category.monthlyLimits.map((limit) {
+                            return ListTile(
+                              title: Text(
+                                  'Mês: ${limit.month}, Ano: ${limit.year}, Limite: R\$ ${limit.limit}'),
+                            );
+                          }).toList(),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                },
               ),
             ],
           ),
