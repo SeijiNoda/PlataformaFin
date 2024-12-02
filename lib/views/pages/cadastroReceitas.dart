@@ -1,8 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:my_app/models/services/receitasService.dart';
-// import '../models/receita.dart';
-// import '../models/despesa.dart';
+import 'package:my_app/views/pages/login.dart';
 
 class CadastroReceitas extends StatefulWidget {
   const CadastroReceitas({super.key});
@@ -14,6 +13,7 @@ class CadastroReceitas extends StatefulWidget {
 class CadastroReceitasState extends State<CadastroReceitas> {
   final user = FirebaseAuth.instance.currentUser;
   List<Map<String, dynamic>> receitasDespesas = [];
+  
   @override
   void initState() {
     super.initState();
@@ -42,14 +42,26 @@ void removerRecOuDes(String id, String tipo) async {
     receitasDespesas = updatedList;
   });
 }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Receitas e Despesas'),
         backgroundColor: Colors.blue,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
+        ),
       ),
       backgroundColor: Colors.grey[100],
+      drawer: _buildDrawer(context), // Adicionando o menu lateral
       body: SafeArea(
         child: Column(
           children: [
@@ -60,7 +72,6 @@ void removerRecOuDes(String id, String tipo) async {
                     DataColumn(label: Text('Descrição')),
                     DataColumn(label: Text('Valor')),
                     DataColumn(label: Text('Tipo')),
-                    //DataColumn(label: Text('Categoria')),
                     DataColumn(label: Text('Ações')),
                   ],
                   rows: receitasDespesas.map((item) {
@@ -72,7 +83,6 @@ void removerRecOuDes(String id, String tipo) async {
                             style: TextStyle(
                               color: item['tipo'] == 'Receita' ? Colors.green : Colors.red,
                             ))),
-                        //DataCell(Text(item['categoria'])),
                         DataCell(
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
@@ -216,6 +226,69 @@ void removerRecOuDes(String id, String tipo) async {
           ],
         );
       },
+    );
+  }
+
+  // Função para construir o Drawer (menu lateral)
+  Widget _buildDrawer(BuildContext context) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          const DrawerHeader(
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
+            child: Text(
+              'Menu Lateral',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+          ListTile(
+            title: const Text('Página 1'),
+            onTap: () {
+              // Substitua a linha abaixo pelo código da navegação para a Página 1
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 1
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Página 2'),
+            onTap: () {
+              // Substitua a linha abaixo pelo código da navegação para a Página 2
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 2
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Cadastro de Categorias'),
+            onTap: () {
+              // Substitua a linha abaixo pelo código da navegação para a Página 3
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 3
+              );
+            },
+          ),
+          ListTile(
+            title: const Text('Sair'),
+            onTap: () {
+              // Substitua a linha abaixo pelo código da navegação para a Página 4
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {  },)), // Troque isso pelo arquivo da Página 4
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }
