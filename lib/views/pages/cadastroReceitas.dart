@@ -1,9 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:my_app/models/services/logout.dart';
 import 'package:my_app/models/services/receitasService.dart';
 import 'package:my_app/views/pages/cadastroCategoria.dart';
 import 'package:my_app/views/pages/login.dart';
+import 'package:my_app/views/pages/metas.dart';
+import 'package:my_app/widgets/drawer_menu.dart'; // Importando o DrawerMenu
+
 
 class CadastroReceitas extends StatefulWidget {
   const CadastroReceitas({super.key});
@@ -111,16 +115,6 @@ void removerRecOuDes(String id, String tipo) async {
   }
 }
 
-  // Função para fazer o logout
-void _logout() async {
-  await FirebaseAuth.instance.signOut();
-  // Após o logout, vamos garantir que a tela de login será a única na pilha de navegação.
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {})),
-  );
-}
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,7 +133,7 @@ void _logout() async {
         ),
       ),
       backgroundColor: Colors.grey[100],
-      drawer: _buildDrawer(context), // Adicionando o menu lateral
+      drawer: DrawerMenu(), // Adicionando o menu lateral
       body: SafeArea(
         child: Column(
           children: [
@@ -304,53 +298,6 @@ void _logout() async {
           ],
         );
       },
-    );
-  }
-
-  // Função para construir o Drawer (menu lateral)
-  Widget _buildDrawer(BuildContext context) {
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          const DrawerHeader(
-            decoration: BoxDecoration(
-              color: Colors.blue,
-            ),
-            child: Text(
-              'Menu Lateral',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-              ),
-            ),
-          ),
-          ListTile(
-            title: const Text('Página 1'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen(showRegisterPage: () {})),
-              ); 
-            },
-          ),
-          ListTile(
-            title: const Text('Cadastro de Categorias'),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => AddCategoryScreen()),
-              );
-            },
-          ),
-          ListTile(
-            title: const Text('Sair'),
-            onTap: () {
-              _logout(); // Chama a função de logout
-            },
-          ),
-        ],
-      ),
     );
   }
 }
