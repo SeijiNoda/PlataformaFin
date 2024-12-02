@@ -18,101 +18,130 @@ class CadastroReceitas extends StatefulWidget {
 class CadastroReceitasState extends State<CadastroReceitas> {
   final user = FirebaseAuth.instance.currentUser;
   List<Map<String, dynamic>> receitasDespesas = [];
+  List<String> categoriasUsuario = []; // Lista para armazenar as categorias do usuário
+  List<String> categoriasPredefinidas = [
+    'Alimentação', 'Transporte', 'Entretenimento'
+  ];
+  String? categoriaSelecionada;
 
   @override
   void initState() {
     super.initState();
     loadReceitasDespesas();
+    loadCategoriasUsuario(); // Carregar as categorias do usuário
   }
 
-void loadReceitasDespesas() async {
-  final userId = user?.uid;
-  if (userId != null) {
-    final db = FirebaseFirestore.instance;
+  // Função para carregar as categorias criadas pelo usuário
+  void loadCategoriasUsuario() async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final categoryCollection = FirebaseFirestore.instance
+          .collection('Usuários')
+          .doc(userId)
+          .collection('Categoria');
 
-    // Carregar receitas e despesas associadas ao usuário
-    final receitasSnapshot = await db.collection('Usuários').doc(userId).collection('Receitas').get();
-    final despesasSnapshot = await db.collection('Usuários').doc(userId).collection('Despesas').get();
+      // Carregar as categorias do usuário
+      final snapshot = await categoryCollection.get();
+      List<String> categorias = [];
+      for (var doc in snapshot.docs) {
+        categorias.add(doc['name']); // Pega o nome da categoria
+      }
 
-    List<Map<String, dynamic>> updatedList = [];
-    
-    // Carregar receitas
-    for (var doc in receitasSnapshot.docs) {
-      updatedList.add({
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'tipo': 'Receita', // Tipo fixo para receitas
-        'categoria': doc['categoria'],
+      setState(() {
+        categoriasUsuario = categorias;
       });
     }
-
-    // Carregar despesas
-    for (var doc in despesasSnapshot.docs) {
-      updatedList.add({
-        'id': doc.id,
-        'descricao': doc['descricao'],
-        'valor': doc['valor'],
-        'tipo': 'Despesa', // Tipo fixo para despesas
-        'categoria': doc['categoria'],
-      });
-    }
-
-    setState(() {
-      receitasDespesas = updatedList;
-    });
   }
-}
 
-void adicionarRecOuDes(String descricao, double valor, String tipo, String categoria) async {
-  final userId = user?.uid; // Pegue o ID do usuário atual
+  void loadReceitasDespesas() async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
 
-  if (userId != null) {
-    final db = FirebaseFirestore.instance;
+      // Carregar receitas e despesas associadas ao usuário
+      final receitasSnapshot = await db.collection('Usuários').doc(userId).collection('Receitas').get();
+      final despesasSnapshot = await db.collection('Usuários').doc(userId).collection('Despesas').get();
 
-    // A estrutura do Firestore será: Usuários -> userId -> Receitas/Despesas
-    final ref = db.collection('Usuários').doc(userId);
+      List<Map<String, dynamic>> updatedList = [];
+      
+      // Carregar receitas
+      for (var doc in receitasSnapshot.docs) {
+        updatedList.add({
+          'id': doc.id,
+          'descricao': doc['descricao'],
+          'valor': doc['valor'],
+          'tipo': 'Receita', // Tipo fixo para receitas
+          'categoria': doc['categoria'],
+        });
+      }
 
-    // Criar ou atualizar a receita/despesa dependendo do tipo
-    if (tipo == 'Receita') {
-      await ref.collection('Receitas').add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
-        'tipo': tipo,
-        'dataCriacao': FieldValue.serverTimestamp(),
-      });
-    } else if (tipo == 'Despesa') {
-      await ref.collection('Despesas').add({
-        'descricao': descricao,
-        'valor': valor,
-        'categoria': categoria,
-        'tipo': tipo,
-        'dataCriacao': FieldValue.serverTimestamp(),
+      // Carregar despesas
+      for (var doc in despesasSnapshot.docs) {
+        updatedList.add({
+          'id': doc.id,
+          'descricao': doc['descricao'],
+          'valor': doc['valor'],
+          'tipo': 'Despesa', // Tipo fixo para despesas
+          'categoria': doc['categoria'],
+        });
+      }
+
+      setState(() {
+        receitasDespesas = updatedList;
       });
     }
-
-    // Recarregar os dados após adicionar
-    loadReceitasDespesas();
   }
-}
 
-void removerRecOuDes(String id, String tipo) async {
-  final userId = user?.uid;
-  if (userId != null) {
-    final db = FirebaseFirestore.instance;
+  void adicionarRecOuDes(String descricao, double valor, String tipo, String categoria) async {
+    final userId = user?.uid; // Pegue o ID do usuário atual
 
-    // Remover o item da subcoleção de acordo com o tipo (Receita ou Despesa)
-    if (tipo == 'Receita') {
-      await db.collection('Usuários').doc(userId).collection('Receitas').doc(id).delete();
-    } else if (tipo == 'Despesa') {
-      await db.collection('Usuários').doc(userId).collection('Despesas').doc(id).delete();
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
+
+      // A estrutura do Firestore será: Usuários -> userId -> Receitas/Despesas
+      final ref = db.collection('Usuários').doc(userId);
+
+      // Criar ou atualizar a receita/despesa dependendo do tipo
+      if (tipo == 'Receita') {
+        await ref.collection('Receitas').add({
+          'descricao': descricao,
+          'valor': valor,
+          'categoria': categoria,
+          'tipo': tipo,
+          'dataCriacao': FieldValue.serverTimestamp(),
+        });
+      } else if (tipo == 'Despesa') {
+        await ref.collection('Despesas').add({
+          'descricao': descricao,
+          'valor': valor,
+          'categoria': categoria,
+          'tipo': tipo,
+          'dataCriacao': FieldValue.serverTimestamp(),
+        });
+      }
+
+      // Recarregar os dados após adicionar
+      loadReceitasDespesas();
     }
-
-    // Recarregar os dados após remoção
-    loadReceitasDespesas();
   }
-}
+
+  // Função para remover Receita ou Despesa
+  void removerRecOuDes(String id, String tipo) async {
+    final userId = user?.uid;
+    if (userId != null) {
+      final db = FirebaseFirestore.instance;
+
+      // Remover o item da subcoleção de acordo com o tipo (Receita ou Despesa)
+      if (tipo == 'Receita') {
+        await db.collection('Usuários').doc(userId).collection('Receitas').doc(id).delete();
+      } else if (tipo == 'Despesa') {
+        await db.collection('Usuários').doc(userId).collection('Despesas').doc(id).delete();
+      }
+
+      // Recarregar os dados após remoção
+      loadReceitasDespesas();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -214,21 +243,18 @@ void removerRecOuDes(String id, String tipo) async {
                       },
                       decoration: const InputDecoration(labelText: 'Tipo'),
                     ),
+                    // Combinação das categorias predefinidas e as do usuário
                     DropdownButtonFormField<String>(
                       value: categoria,
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'Alimentacao',
-                          child: Text('Alimentação'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Transporte',
-                          child: Text('Transporte'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'Entretenimento',
-                          child: Text('Entretenimento'),
-                        ),
+                      items: [
+                        ...categoriasPredefinidas.map((cat) => DropdownMenuItem(
+                              value: cat,
+                              child: Text(cat),
+                            )),
+                        ...categoriasUsuario.map((cat) => DropdownMenuItem(
+                              value: cat,
+                              child: Text(cat),
+                            )),
                       ],
                       onChanged: (value) {
                         setState(() {
